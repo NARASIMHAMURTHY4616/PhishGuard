@@ -1,4 +1,13 @@
-# PhishGaurd
+
+<p align="center">
+  <img src="https://media2.dev.to/dynamic/image/width=1000,height=420,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F21zx8n07k8l8d02djhcp.png" alt="PhishGuard Banner" width="100%">
+</p>
+
+<h1 align="center">🎣 PhishGuard</h1>
+
+<p align="center">
+  Interactive Phishing Awareness Training Platform
+</p>
 ## Phishing Awareness Training Platform
 
 An interactive cybersecurity awareness website that teaches users how to identify, avoid, and report phishing attacks through real-world simulations, interactive exercises, quizzes, and verifiable certificates. :contentReference[oaicite:0]{index=0}
