@@ -179,8 +179,6 @@ This project was developed to promote cybersecurity awareness and educate users 
 
 ## 📸 Screenshots
 
-Add screenshots here:
-
 - Homepage
 - Interactive Email Demo
 - Attack Examples
