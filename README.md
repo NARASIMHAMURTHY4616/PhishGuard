@@ -132,13 +132,13 @@ The system confirms certificate authenticity and displays holder information. :c
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/phishguard.git
+git clone https://github.com/NARASIMHAMURTHY4616/PhishGuard.git
 ```
 
 ### Open the Project
 
 ```bash
-cd phishguard
+cd PhishGuard
 ```
 
 Open:
