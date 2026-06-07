@@ -1,0 +1,3428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhishGuard — Cybersecurity Awareness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@200;300;400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --bg-void: #030508;
+  --bg-deep: #060c12;
+  --bg-panel: #0a1520;
+  --bg-card: #0d1e2e;
+  --bg-elevated: #112233;
+  --accent-cyan: #00d4ff;
+  --accent-green: #00ff88;
+  --accent-red: #ff3355;
+  --accent-amber: #ffaa00;
+  --accent-purple: #8855ff;
+  --text-primary: #e8f4ff;
+  --text-secondary: #7aa8c8;
+  --text-muted: #3a6080;
+  --border-glow: rgba(0, 212, 255, 0.2);
+  --border-subtle: rgba(0, 212, 255, 0.08);
+  --grid-line: rgba(0, 212, 255, 0.04);
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-display: 'Exo 2', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─── GRID BACKGROUND ─────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── SCANLINE OVERLAY ──────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── MATRIX RAIN CANVAS ──────────────────────── */
+#matrix-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── NAV ──────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: rgba(3,5,8,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-glow);
+  padding: 0 2rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--accent-cyan);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.nav-logo .logo-icon {
+  width: 32px; height: 32px;
+  border: 2px solid var(--accent-cyan);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  box-shadow: 0 0 12px rgba(0,212,255,0.3);
+}
+
+.nav-links {
+  display: flex;
+  gap: 0;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 50%; right: 50%;
+  height: 2px;
+  background: var(--accent-cyan);
+  transition: left 0.2s, right 0.2s;
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.nav-links a:hover { color: var(--accent-cyan); }
+.nav-links a:hover::after { left: 1rem; right: 1rem; }
+
+/* ─── SECTION WRAPPER ─────────────────────────── */
+section {
+  position: relative;
+  z-index: 2;
+}
+
+/* ─── HERO ────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 2rem 4rem;
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%,-50%) scale(1.15); opacity: 0.6; }
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.25);
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  padding: 0.4rem 1rem;
+  border-radius: 2px;
+  margin-bottom: 2rem;
+  animation: fadeInDown 0.8s ease both;
+}
+
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  animation: blink 1.5s ease-in-out infinite;
+  box-shadow: 0 0 6px var(--accent-cyan);
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  animation: fadeInUp 0.8s 0.2s ease both;
+  margin-bottom: 0.5rem;
+}
+
+.hero-title .line1 { color: var(--text-primary); }
+.hero-title .line2 {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--accent-cyan);
+  text-shadow: none;
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  color: var(--text-secondary);
+  max-width: 580px;
+  margin: 1.5rem auto 2.5rem;
+  animation: fadeInUp 0.8s 0.4s ease both;
+  letter-spacing: 0.02em;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  animation: fadeInUp 0.8s 0.6s ease both;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.2rem;
+  color: var(--accent-cyan);
+  display: block;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(0,212,255,0.5);
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+.cta-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  animation: fadeInUp 0.8s 0.7s ease both;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-cyan), #0088ff);
+  color: #000;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.85rem 2rem;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(0,212,255,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(0,212,255,0.5);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--accent-cyan);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.85rem 2rem;
+  border: 1px solid rgba(0,212,255,0.4);
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(0,212,255,0.08);
+  border-color: var(--accent-cyan);
+}
+
+@keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:none; } }
+@keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+
+/* ─── SECTION HEADERS ─────────────────────────── */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-label::before {
+  content: '';
+  width: 30px; height: 1px;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 6px var(--accent-cyan);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+/* ─── PHISHING EMAIL DEMO ─────────────────────── */
+#demo {
+  padding: 6rem 2rem;
+  background: var(--bg-deep);
+}
+
+.demo-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.demo-header { margin-bottom: 3rem; }
+
+.email-window {
+  background: #1a1a2e;
+  border: 1px solid var(--border-glow);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(0,212,255,0.08), 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.email-titlebar {
+  background: var(--bg-panel);
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.titlebar-dots { display: flex; gap: 6px; }
+.dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+}
+.dot-red { background: #ff5f57; }
+.dot-yellow { background: #febc2e; }
+.dot-green { background: #28c840; }
+
+.titlebar-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.email-toolbar {
+  background: var(--bg-card);
+  padding: 0.6rem 1.25rem;
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.email-meta {
+  background: var(--bg-card);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.meta-label {
+  color: var(--text-muted);
+  min-width: 45px;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.meta-value { color: var(--text-secondary); }
+
+.suspicious {
+  cursor: pointer;
+  border-bottom: 2px dashed rgba(255, 170, 0, 0.5);
+  color: var(--text-primary);
+  transition: all 0.2s;
+  position: relative;
+}
+
+.suspicious:hover {
+  border-bottom-color: var(--accent-amber);
+  color: var(--accent-amber);
+}
+
+.suspicious.clicked {
+  border-bottom-color: var(--accent-red);
+  color: var(--accent-red);
+  border-bottom-style: solid;
+}
+
+.email-body {
+  padding: 2rem 2.5rem;
+  background: #f5f4f0;
+  color: #333;
+  font-family: 'Georgia', serif;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.email-body .suspicious {
+  color: #1a5276;
+}
+.email-body .suspicious:hover { color: #c0392b; }
+.email-body .suspicious.clicked { color: #c0392b; }
+
+.email-body .email-header-row {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fake-logo {
+  background: linear-gradient(135deg, #1a3a8f, #0a2470);
+  color: white;
+  font-family: 'Arial', sans-serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  letter-spacing: -0.05em;
+}
+
+.fake-logo span { color: #60a0ff; }
+
+.email-greeting { margin-bottom: 1rem; }
+.email-content p { margin-bottom: 1rem; }
+
+.email-cta {
+  display: block;
+  width: fit-content;
+  margin: 1.5rem 0;
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, #c0392b, #962d22);
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.email-cta.suspicious { color: #fff; border-bottom: 2px dashed rgba(255,255,0,0.6); }
+.email-cta.suspicious:hover { background: #962d22; color: #ff6; }
+
+.email-footer-text {
+  font-size: 0.78rem;
+  color: #888;
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
+  margin-top: 1.5rem;
+  line-height: 1.5;
+}
+
+.hint-bar {
+  background: var(--bg-panel);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.hint-bar .hint-icon { color: var(--accent-amber); font-size: 1rem; }
+.hint-bar .hint-count { color: var(--accent-cyan); }
+
+/* ─── TOOLTIP ─────────────────────────────────── */
+.tooltip-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(4px);
+  padding: 2rem;
+}
+
+.tooltip-overlay.active { display: flex; }
+
+.tooltip-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--accent-red);
+  border-radius: 8px;
+  max-width: 480px;
+  width: 100%;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 0 40px rgba(255,51,85,0.3);
+  animation: tooltipIn 0.25s cubic-bezier(.175,.885,.32,1.275);
+}
+
+@keyframes tooltipIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.tooltip-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.tooltip-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--accent-red);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.tooltip-body {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+}
+
+.tooltip-tip {
+  background: rgba(255,51,85,0.08);
+  border-left: 3px solid var(--accent-red);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+}
+
+.tooltip-close {
+  background: rgba(255,51,85,0.15);
+  border: 1px solid rgba(255,51,85,0.4);
+  color: var(--accent-red);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tooltip-close:hover { background: rgba(255,51,85,0.25); }
+
+.tooltip-progress {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-align: right;
+  margin-bottom: 0.75rem;
+}
+
+/* ─── TACTICS ─────────────────────────────────── */
+#tactics {
+  padding: 6rem 2rem;
+}
+
+.tactics-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.tactics-header { margin-bottom: 3.5rem; }
+
+.tactics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.tactic-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: default;
+}
+
+.tactic-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent-cyan)), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tactic-card:hover {
+  border-color: var(--card-accent, var(--accent-cyan));
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(var(--glow-rgb, 0,212,255), 0.1);
+}
+
+.tactic-card:hover::before { opacity: 1; }
+
+.tactic-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1.25rem;
+  display: block;
+}
+
+.tactic-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.tactic-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.tactic-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.15);
+  color: var(--text-muted);
+}
+
+/* ─── REAL WORLD EXAMPLES ─────────────────────── */
+#examples {
+  padding: 6rem 2rem;
+  background: var(--bg-deep);
+}
+
+.examples-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.example-tabs {
+  display: flex;
+  gap: 0;
+  margin: 3rem 0 2rem;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+}
+
+.example-tab {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  margin-bottom: -1px;
+}
+
+.example-tab:hover { color: var(--text-secondary); }
+.example-tab.active {
+  color: var(--accent-cyan);
+  border-bottom-color: var(--accent-cyan);
+}
+
+.example-panel { display: none; }
+.example-panel.active { display: block; }
+
+.example-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.example-header {
+  background: var(--bg-panel);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.example-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.severity-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+  border-radius: 2px;
+}
+
+.severity-critical {
+  background: rgba(255,51,85,0.15);
+  border: 1px solid rgba(255,51,85,0.4);
+  color: var(--accent-red);
+}
+
+.severity-high {
+  background: rgba(255,170,0,0.12);
+  border: 1px solid rgba(255,170,0,0.35);
+  color: var(--accent-amber);
+}
+
+.example-content {
+  padding: 2rem;
+}
+
+.example-screenshot {
+  background: #f8f8f8;
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-family: 'Arial', sans-serif;
+  font-size: 0.88rem;
+  color: #222;
+  position: relative;
+}
+
+.warning-highlight {
+  position: relative;
+  display: inline;
+  background: rgba(255, 200, 0, 0.3);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.warning-highlight::after {
+  content: attr(data-warn);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: var(--accent-amber);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  padding: 0.3rem 0.6rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255,170,0,0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.warning-highlight:hover::after { opacity: 1; }
+
+.warning-list {
+  list-style: none;
+}
+
+.warning-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.warning-list li:last-child { border-bottom: none; }
+.warning-icon { color: var(--accent-red); font-size: 0.9rem; flex-shrink: 0; margin-top: 2px; }
+
+.warning-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent-red);
+  background: rgba(255,51,85,0.1);
+  border: 1px solid rgba(255,51,85,0.25);
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ─── BEST PRACTICES ─────────────────────────── */
+#practices {
+  padding: 6rem 2rem;
+}
+
+.practices-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.practices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+  margin-top: 3rem;
+}
+
+.practice-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: none;
+}
+
+.practice-card.in-view {
+  animation: slideUp 0.5s ease forwards;
+}
+
+@keyframes slideUp {
+  to { opacity:1; transform:none; }
+}
+
+.practice-card:hover {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 30px rgba(0,255,136,0.08);
+}
+
+.practice-num {
+  position: absolute;
+  top: 1.25rem; right: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(0,255,136,0.08);
+  line-height: 1;
+}
+
+.practice-icon {
+  font-size: 2rem;
+  width: 52px; height: 52px;
+  background: rgba(0,255,136,0.08);
+  border: 1px solid rgba(0,255,136,0.2);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.practice-card:hover .practice-icon {
+  background: rgba(0,255,136,0.15);
+  box-shadow: 0 0 20px rgba(0,255,136,0.2);
+}
+
+.practice-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.practice-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.practice-status {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--accent-green);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+}
+
+.practice-status::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 6px var(--accent-green);
+}
+
+/* ─── QUIZ ────────────────────────────────────── */
+#quiz {
+  padding: 6rem 2rem;
+  background: var(--bg-deep);
+}
+
+.quiz-container {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.quiz-ui {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(0,212,255,0.06);
+  margin-top: 3rem;
+}
+
+.quiz-progress-bar {
+  height: 3px;
+  background: var(--bg-panel);
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px var(--accent-cyan);
+  width: 0%;
+}
+
+.quiz-header {
+  background: var(--bg-panel);
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.quiz-counter {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.quiz-counter span { color: var(--accent-cyan); }
+
+.quiz-timer {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.quiz-timer.warning { color: var(--accent-red); animation: blink 0.8s infinite; }
+
+.quiz-body { padding: 2.5rem 2rem 2rem; }
+
+.quiz-question {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+  min-height: 80px;
+}
+
+.quiz-context {
+  background: rgba(0,212,255,0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1.75rem;
+  line-height: 1.6;
+  display: none;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quiz-option {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 400;
+  text-align: left;
+  color: var(--text-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+.quiz-option:hover:not(.disabled) {
+  border-color: rgba(0,212,255,0.35);
+  background: rgba(0,212,255,0.05);
+  color: var(--text-primary);
+}
+
+.quiz-option.correct {
+  border-color: var(--accent-green);
+  background: rgba(0,255,136,0.08);
+  color: var(--text-primary);
+}
+
+.quiz-option.wrong {
+  border-color: var(--accent-red);
+  background: rgba(255,51,85,0.08);
+  color: var(--text-secondary);
+}
+
+.quiz-option.disabled { cursor: default; }
+
+.opt-letter {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  width: 26px; height: 26px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.quiz-option.correct .opt-letter {
+  background: rgba(0,255,136,0.2);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+.quiz-option.wrong .opt-letter {
+  background: rgba(255,51,85,0.2);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.quiz-feedback {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  display: none;
+}
+
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.2); color: var(--accent-green); }
+.quiz-feedback.wrong-fb { background: rgba(255,51,85,0.06); border: 1px solid rgba(255,51,85,0.2); color: #ff7799; }
+
+.quiz-footer {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quiz-score-mini {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.quiz-score-mini span { color: var(--accent-cyan); }
+
+.btn-next {
+  background: linear-gradient(135deg, var(--accent-cyan), #0088ff);
+  color: #000;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.5rem;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: none;
+}
+
+.btn-next.show { display: block; }
+.btn-next:hover { box-shadow: 0 0 20px rgba(0,212,255,0.4); }
+
+/* ─── NAME INPUT ─────────────────────────────── */
+.name-input-group {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.name-input-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.name-input-label span {
+  color: var(--accent-red);
+}
+
+.name-input-field {
+  width: 100%;
+  background: rgba(0,212,255,0.04);
+  border: 1px solid rgba(0,212,255,0.25);
+  border-radius: 5px;
+  padding: 0.85rem 1.1rem;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.name-input-field::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.name-input-field:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+}
+
+.name-input-field.error {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 0 3px rgba(255,51,85,0.1);
+  animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.name-error-msg {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent-red);
+  display: none;
+  text-align: left;
+  padding-top: 0.2rem;
+}
+
+.name-error-msg.show { display: block; }
+
+/* ─── CONGRATS OVERLAY ──────────────────────── */
+.congrats-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(8px);
+  padding: 2rem;
+}
+
+.congrats-overlay.active { display: flex; }
+
+.congrats-box {
+  background: var(--bg-panel);
+  border: 1px solid rgba(0,212,255,0.3);
+  border-radius: 16px;
+  max-width: 540px;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 0 80px rgba(0,212,255,0.15), 0 40px 80px rgba(0,0,0,0.6);
+  animation: congratsIn 0.5s cubic-bezier(.175,.885,.32,1.275) both;
+  position: relative;
+}
+
+@keyframes congratsIn {
+  from { transform: scale(0.7) translateY(40px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.congrats-top {
+  background: linear-gradient(135deg, #0a1f10, #061520);
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(0,255,136,0.15);
+}
+
+.congrats-top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(0,255,136,0.12) 0%, transparent 65%);
+}
+
+.confetti-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+  top: -10px;
+}
+
+@keyframes confettiFall {
+  to { transform: translateY(320px) rotate(720deg); opacity: 0; }
+}
+
+.congrats-badge {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0,255,136,0.2), rgba(0,212,255,0.15));
+  border: 2px solid rgba(0,255,136,0.5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  margin: 0 auto 1.25rem;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 30px rgba(0,255,136,0.3);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%,100% { box-shadow: 0 0 30px rgba(0,255,136,0.3); }
+  50% { box-shadow: 0 0 50px rgba(0,255,136,0.5); }
+}
+
+.congrats-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-green);
+  margin-bottom: 0.5rem;
+  position: relative; z-index: 1;
+}
+
+.congrats-headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  position: relative; z-index: 1;
+  margin-bottom: 0.4rem;
+}
+
+.congrats-name {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 1.1rem;
+  color: var(--accent-cyan);
+  position: relative; z-index: 1;
+  letter-spacing: 0.02em;
+}
+
+.congrats-body {
+  padding: 1.75rem 2rem;
+  text-align: center;
+}
+
+.congrats-score-row {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.congrats-stat {
+  text-align: center;
+  background: rgba(0,212,255,0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.85rem 1.25rem;
+  min-width: 90px;
+}
+
+.congrats-stat-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.75rem;
+  line-height: 1;
+  display: block;
+}
+
+.congrats-stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+.congrats-msg {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 1.75rem;
+  font-weight: 300;
+}
+
+.congrats-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-congrats-cert {
+  background: linear-gradient(135deg, var(--accent-green), #00cc66);
+  color: #000;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.8rem 1.75rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(0,255,136,0.3);
+}
+
+.btn-congrats-cert:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(0,255,136,0.5);
+}
+
+.btn-congrats-close {
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.8rem 1.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-congrats-close:hover {
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+/* ─── QUIZ START SCREEN ───────────────────────── */
+.quiz-start {
+  padding: 3rem 2rem 3.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.quiz-start-icon {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: rgba(0,212,255,0.06);
+  border: 2px solid rgba(0,212,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  box-shadow: 0 0 30px rgba(0,212,255,0.15);
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.quiz-start-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+}
+
+.quiz-start-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  max-width: 420px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.quiz-start-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: rgba(0,212,255,0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 1.25rem 1.75rem;
+  text-align: left;
+  width: 100%;
+  max-width: 380px;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.rule-icon { font-size: 0.9rem; flex-shrink: 0; }
+
+.btn-start-quiz {
+  background: linear-gradient(135deg, var(--accent-cyan), #0088ff);
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1rem 3rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: all 0.25s;
+  box-shadow: 0 0 25px rgba(0,212,255,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-start-quiz::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-start-quiz:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 40px rgba(0,212,255,0.5);
+}
+
+.btn-start-quiz:hover::before { opacity: 1; }
+.btn-start-quiz:active { transform: translateY(-1px); }
+
+.btn-start-quiz .start-arrow {
+  font-size: 1.2rem;
+  transition: transform 0.2s;
+}
+
+.btn-start-quiz:hover .start-arrow { transform: translateX(4px); }
+
+.quiz-best-score {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.quiz-best-score span { color: var(--accent-amber); }
+
+/* ─── RESULTS ─────────────────────────────────── */
+.quiz-results {
+  display: none;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.quiz-results.show { display: block; }
+
+.score-ring {
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  margin: 0 auto 2rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-ring svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.score-ring-track { fill: none; stroke: var(--bg-panel); stroke-width: 8; }
+.score-ring-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.5s ease;
+}
+
+.score-center {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.5rem;
+  line-height: 1;
+  z-index: 1;
+}
+
+.score-pct {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  z-index: 1;
+}
+
+.result-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.result-message {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  max-width: 420px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+
+.result-breakdown {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.breakdown-item {
+  text-align: center;
+}
+
+.breakdown-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.breakdown-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+.result-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ─── CERTIFICATE ─────────────────────────────── */
+.certificate-container {
+  display: none;
+  margin-top: 2.5rem;
+  padding: 2rem;
+  background: var(--bg-panel);
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 8px;
+}
+
+.certificate-container.show { display: block; }
+
+#cert-canvas { display: block; max-width: 100%; margin: 0 auto 1.5rem; border-radius: 6px; }
+
+.cert-download {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ─── FOOTER ──────────────────────────────────── */
+footer {
+  padding: 3rem 2rem;
+  background: var(--bg-void);
+  border-top: 1px solid var(--border-subtle);
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.footer-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--accent-cyan);
+  margin-bottom: 0.75rem;
+}
+
+.footer-text {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 768px) {
+  nav { padding: 0 1rem; }
+  .nav-links { display: none; }
+  .email-body { padding: 1.25rem; }
+  .quiz-body { padding: 1.5rem 1.25rem 1.25rem; }
+  .quiz-footer { padding: 1rem 1.25rem; flex-direction: column; gap: 0.75rem; align-items: stretch; }
+  .btn-next { width: 100%; text-align: center; }
+  .hero-stats { gap: 2rem; }
+  .result-breakdown { gap: 1.25rem; }
+  .example-tabs { gap: 0; }
+  .example-tab { padding: 0.75rem 1rem; font-size: 0.78rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { font-size: 2.5rem; }
+  .cta-group { flex-direction: column; align-items: center; }
+}
+
+/* ─── SCROLL ANIMATIONS ──────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── GLITCH EFFECT ──────────────────────────── */
+.glitch {
+  position: relative;
+}
+
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 20%, 100% 20%, 100% 35%, 0 35%);
+  opacity: 0;
+}
+
+.glitch:hover::before {
+  animation: glitch1 0.3s steps(2) forwards;
+  color: var(--accent-red);
+  left: 2px;
+  opacity: 0.8;
+}
+
+.glitch:hover::after {
+  animation: glitch2 0.3s steps(2) forwards;
+  color: var(--accent-cyan);
+  left: -2px;
+  opacity: 0.8;
+  clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+}
+
+@keyframes glitch1 {
+  0% { clip-path: polygon(0 20%, 100% 20%, 100% 35%, 0 35%); }
+  50% { clip-path: polygon(0 55%, 100% 55%, 100% 70%, 0 70%); }
+  100% { clip-path: polygon(0 20%, 100% 20%, 100% 35%, 0 35%); opacity:0; }
+}
+
+@keyframes glitch2 {
+  0% { clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%); }
+  50% { clip-path: polygon(0 30%, 100% 30%, 100% 45%, 0 45%); }
+  100% { clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%); opacity:0; }
+}
+/* ─── VERIFY SECTION ─────────────────────────── */
+#verify {
+  padding: 6rem 2rem;
+  background: var(--bg-deep);
+}
+
+.verify-container {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.verify-search-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+  padding: 2.5rem;
+  margin: 3rem 0 2rem;
+  box-shadow: 0 0 40px rgba(0,212,255,0.05);
+}
+
+.verify-input-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.verify-input {
+  flex: 1;
+  min-width: 220px;
+  background: var(--bg-panel);
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 6px;
+  padding: 0.9rem 1.25rem;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.verify-input::placeholder { color: var(--text-muted); }
+.verify-input:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(0,255,136,0.1);
+}
+
+.btn-verify {
+  background: linear-gradient(135deg, var(--accent-green), #00cc66);
+  color: #000;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.9rem 2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(0,255,136,0.2);
+  white-space: nowrap;
+}
+
+.btn-verify:hover { transform: translateY(-2px); box-shadow: 0 0 35px rgba(0,255,136,0.4); }
+
+.verify-hint {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.9rem;
+  letter-spacing: 0.05em;
+}
+
+.verify-result {
+  border-radius: 10px;
+  padding: 2rem;
+  display: none;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.verify-result.show { display: block; }
+
+.verify-result.success {
+  background: rgba(0,255,136,0.04);
+  border: 1px solid rgba(0,255,136,0.3);
+}
+
+.verify-result.fail {
+  background: rgba(255,51,85,0.04);
+  border: 1px solid rgba(255,51,85,0.25);
+}
+
+.verify-result-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.verify-status-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.verify-status-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+.verify-status-title.ok { color: var(--accent-green); }
+.verify-status-title.bad { color: var(--accent-red); }
+
+.verify-status-sub {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-top: 0.2rem;
+}
+
+.verify-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.verify-field {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+}
+
+.verify-field-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.verify-field-value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.verify-badge-valid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.35);
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+}
+
+.verify-badge-valid::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 6px var(--accent-green);
+  animation: blink 1.5s infinite;
+}
+
+.verify-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+.btn-copy-link {
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.3);
+  color: var(--accent-cyan);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+
+.btn-copy-link:hover { background: rgba(0,212,255,0.15); }
+
+.recent-certs {
+  margin-top: 2rem;
+}
+
+.recent-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recent-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recent-item:hover { border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.04); }
+
+.recent-id {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent-cyan);
+  letter-spacing: 0.06em;
+}
+
+.recent-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.recent-date {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+/* ─── CERT CONTAINER UPDATES ─────────────────── */
+.cert-meta-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.cert-id-display {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent-cyan);
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.2);
+  padding: 0.35rem 0.85rem;
+  border-radius: 4px;
+  letter-spacing: 0.1em;
+}
+
+.cert-download {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+</style>
+<body>
+
+<canvas id="matrix-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">
+    <div class="logo-icon">⛨</div>
+    PhishGuard
+  </a>
+  <ul class="nav-links">
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#tactics">Tactics</a></li>
+    <li><a href="#examples">Examples</a></li>
+    <li><a href="#practices">Practices</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+    <li><a href="#verify" style="color:var(--accent-green)">✦ Verify</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div>
+    <div class="hero-badge"><span class="badge-dot"></span> Security Awareness Training</div>
+    <h1 class="hero-title glitch" data-text="PHISHING">
+      <div class="line1">KNOW YOUR</div>
+      <div class="line2">ENEMY</div>
+    </h1>
+    <p class="hero-subtitle">Phishing attacks account for over 90% of successful cyberattacks. Learn to recognize, resist, and report them before they compromise your organization.</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num" data-target="3.4">0</span>
+        <div class="stat-label">Billion Phishing Emails / Day</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-target="91">0</span>
+        <div class="stat-label">% Attacks Start w/ Phishing</div>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-target="17">0</span>
+        <div class="stat-label">Seconds Between New Phishing Sites</div>
+      </div>
+    </div>
+    <div class="cta-group">
+      <a href="#demo" class="btn-primary">⚡ Try Interactive Demo</a>
+      <a href="#quiz" class="btn-secondary">📋 Take the Quiz</a>
+    </div>
+  </div>
+</section>
+
+<!-- PHISHING EMAIL DEMO -->
+<section id="demo">
+  <div class="demo-container">
+    <div class="demo-header reveal">
+      <div class="section-label">Interactive Demo</div>
+      <h2 class="section-title">Spot the Red Flags</h2>
+      <p class="section-desc">Click on any underlined element in the email below to learn why it's a warning sign. Can you find all <strong style="color:var(--accent-amber)">6 red flags</strong>?</p>
+    </div>
+    <div class="email-window reveal">
+      <div class="email-titlebar">
+        <div class="titlebar-dots">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+        </div>
+        <div class="titlebar-title">Inbox — Outlook</div>
+      </div>
+      <div class="email-toolbar">
+        <span>📥 Inbox</span>
+        <span>📧 1 of 1</span>
+        <span style="margin-left:auto; color: var(--accent-amber);">⚠ External Sender</span>
+      </div>
+      <div class="email-meta">
+        <div class="meta-row">
+          <span class="meta-label">FROM:</span>
+          <span class="meta-value">
+            <span class="suspicious" data-id="1">security@paypa1-notifications.net</span>
+          </span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">TO:</span>
+          <span class="meta-value">you@yourcompany.com</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">SUBJ:</span>
+          <span class="meta-value">
+            <span class="suspicious" data-id="2">URGENT: Your PayPal Account Has Been Limited - Immediate Action Required</span>
+          </span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">DATE:</span>
+          <span class="meta-value">Today, 3:47 AM</span>
+        </div>
+      </div>
+      <div class="email-body">
+        <div class="email-header-row">
+          <div class="fake-logo">Pay<span>Pal</span></div>
+          <span style="font-size:0.85rem; color:#888">Customer Security Team</span>
+        </div>
+        <div class="email-greeting"><strong>Dear Valued Customer,</strong></div>
+        <div class="email-content">
+          <p>We have detected <span class="suspicious" data-id="3">unusual activity on your PayPal account</span>. To protect your account, we have temporarily limited your access.</p>
+          <p>To restore full access to your account, you must verify your information <span class="suspicious" data-id="4">within the next 24 hours</span> or your account will be permanently suspended.</p>
+          <p>Please click the button below to complete your verification:</p>
+          <a href="#" class="email-cta suspicious" data-id="5" onclick="return false;">Verify My Account Now →</a>
+          <p style="font-size:0.85rem; color:#555">If you do not verify your account, you will lose access to all pending transactions and your balance may be affected.</p>
+        </div>
+        <div class="email-footer-text">
+          This message was sent to you@yourcompany.com. If you didn't request this, please ignore this email.<br>
+          <span class="suspicious" data-id="6">PayPal, Inc. 2211 North First Street, London UK 10021</span><br>
+          © 2024 PayPal Inc. All rights reserved.
+        </div>
+      </div>
+      <div class="hint-bar">
+        <span class="hint-icon">💡</span>
+        <span>Click the <strong style="color:var(--accent-amber)">underlined elements</strong> to reveal red flags.</span>
+        <span style="margin-left:auto">Found: <span class="hint-count" id="found-count">0</span>/6</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLTIP OVERLAY -->
+<div class="tooltip-overlay" id="tooltip-overlay">
+  <div class="tooltip-box">
+    <div class="tooltip-progress" id="tooltip-progress"></div>
+    <div class="tooltip-icon" id="tooltip-icon"></div>
+    <div class="tooltip-title" id="tooltip-title"></div>
+    <div class="tooltip-body" id="tooltip-body"></div>
+    <div class="tooltip-tip" id="tooltip-tip"></div>
+    <button class="tooltip-close" onclick="closeTooltip()">Got it ✓</button>
+  </div>
+</div>
+
+<!-- TACTICS -->
+<section id="tactics">
+  <div class="tactics-container">
+    <div class="tactics-header reveal">
+      <div class="section-label">Social Engineering</div>
+      <h2 class="section-title">How Attackers Manipulate You</h2>
+      <p class="section-desc">Phishing isn't just technical — it exploits fundamental human psychology. Understanding these tactics is your first line of defense.</p>
+    </div>
+    <div class="tactics-grid">
+      <div class="tactic-card reveal" style="--card-accent:#ff3355; --glow-rgb:255,51,85">
+        <span class="tactic-icon">⚡</span>
+        <div class="tactic-name">Urgency & Scarcity</div>
+        <div class="tactic-desc">Attackers create artificial time pressure — "Your account will be deleted in 24 hours" — bypassing rational thinking and pushing you to act before you check.</div>
+        <div class="tactic-tags">
+          <span class="tag">Fear of Loss</span>
+          <span class="tag">Time Pressure</span>
+          <span class="tag">FOMO</span>
+        </div>
+      </div>
+      <div class="tactic-card reveal" style="--card-accent:#ffaa00; --glow-rgb:255,170,0">
+        <span class="tactic-icon">👔</span>
+        <div class="tactic-name">Authority Impersonation</div>
+        <div class="tactic-desc">Emails appear to come from the CEO, IT department, IRS, or a major bank. People are conditioned to comply with authority figures without questioning them.</div>
+        <div class="tactic-tags">
+          <span class="tag">CEO Fraud</span>
+          <span class="tag">Brand Spoofing</span>
+          <span class="tag">Gov Impers.</span>
+        </div>
+      </div>
+      <div class="tactic-card reveal" style="--card-accent:#8855ff; --glow-rgb:136,85,255">
+        <span class="tactic-icon">🎣</span>
+        <div class="tactic-name">Spear Phishing</div>
+        <div class="tactic-desc">Highly targeted attacks using personal details scraped from LinkedIn, social media, or previous breaches. The email seems to know who you are, building false trust.</div>
+        <div class="tactic-tags">
+          <span class="tag">OSINT</span>
+          <span class="tag">Personalization</span>
+          <span class="tag">Whaling</span>
+        </div>
+      </div>
+      <div class="tactic-card reveal" style="--card-accent:#00d4ff; --glow-rgb:0,212,255">
+        <span class="tactic-icon">🤝</span>
+        <div class="tactic-name">Reciprocity & Trust</div>
+        <div class="tactic-desc">Attackers offer something valuable — a free gift, helpful information, a document you "requested" — before asking for something in return, exploiting natural social reciprocity.</div>
+        <div class="tactic-tags">
+          <span class="tag">Pretexting</span>
+          <span class="tag">Trojan</span>
+          <span class="tag">Free Offers</span>
+        </div>
+      </div>
+      <div class="tactic-card reveal" style="--card-accent:#00ff88; --glow-rgb:0,255,136">
+        <span class="tactic-icon">😱</span>
+        <div class="tactic-name">Fear & Intimidation</div>
+        <div class="tactic-desc">"We have your browsing history." "Pay now or face legal action." Extortion-style phishing hijacks your fight-or-flight response, clouding critical thinking.</div>
+        <div class="tactic-tags">
+          <span class="tag">Sextortion</span>
+          <span class="tag">Ransomware</span>
+          <span class="tag">Blackmail</span>
+        </div>
+      </div>
+      <div class="tactic-card reveal" style="--card-accent:#ff6600; --glow-rgb:255,102,0">
+        <span class="tactic-icon">🔗</span>
+        <div class="tactic-name">URL Obfuscation</div>
+        <div class="tactic-desc">Lookalike domains (paypa1.com, g00gle.com), URL shorteners, or trusted redirect services mask malicious destinations. Even tech-savvy users can be fooled at a glance.</div>
+        <div class="tactic-tags">
+          <span class="tag">Typosquatting</span>
+          <span class="tag">IDN Homograph</span>
+          <span class="tag">Redirects</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REAL WORLD EXAMPLES -->
+<section id="examples">
+  <div class="examples-container">
+    <div class="reveal">
+      <div class="section-label">Case Studies</div>
+      <h2 class="section-title">Real-World Attack Patterns</h2>
+      <p class="section-desc">Study these annotated examples from actual phishing campaigns. Hover over highlighted text to see the warning signs.</p>
+    </div>
+
+    <div class="example-tabs reveal">
+      <button class="example-tab active" onclick="showTab(0)">Bank Phish</button>
+      <button class="example-tab" onclick="showTab(1)">IT Help Desk</button>
+      <button class="example-tab" onclick="showTab(2)">Package Delivery</button>
+      <button class="example-tab" onclick="showTab(3)">Job Offer</button>
+    </div>
+
+    <div id="example-panels">
+      <!-- Panel 0 -->
+      <div class="example-panel active">
+        <div class="example-card reveal">
+          <div class="example-header">
+            <div class="example-title">Banking Credential Harvest</div>
+            <span class="severity-badge severity-critical">Critical</span>
+          </div>
+          <div class="example-content">
+            <div class="example-screenshot">
+              <div style="margin-bottom:0.75rem; font-weight:bold; font-size:0.95rem">From: <warning-highlight style="background:rgba(255,200,0,0.3); padding:1px 3px" data-warn="⚠ Spoofed domain">alerts@chase-secure-banking.com</warning-highlight></div>
+              <div style="margin-bottom:0.75rem; font-weight:bold">Subject: <span style="background:rgba(255,200,0,0.3)">⚠ Important: Verify Your Identity to Avoid Account Suspension</span></div>
+              <div style="border-top:1px solid #ddd; padding-top:0.75rem; font-size:0.9rem;">
+                Dear Chase Customer,<br><br>
+                Your account requires immediate verification. <span class="warning-highlight" data-warn="⚠ Urgency tactic">We have detected suspicious login attempts</span> and your account access has been restricted.<br><br>
+                Please <span class="warning-highlight" data-warn="⚠ Fake link">click here to verify: http://secure-chase-verify.ru/login</span> within 12 hours.
+              </div>
+            </div>
+            <ul class="warning-list">
+              <li><span class="warning-num">1</span>Domain "chase-secure-banking.com" is NOT chase.com — legitimate banks use their primary domain</li>
+              <li><span class="warning-num">2</span>The link points to a .ru (Russia) domain — Chase would never use this</li>
+              <li><span class="warning-num">3</span>Vague threat of "suspicious activity" without specifics is a hallmark tactic</li>
+              <li><span class="warning-num">4</span>12-hour deadline creates artificial urgency to prevent careful verification</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Panel 1 -->
+      <div class="example-panel">
+        <div class="example-card reveal">
+          <div class="example-header">
+            <div class="example-title">IT Help Desk Credential Theft</div>
+            <span class="severity-badge severity-critical">Critical</span>
+          </div>
+          <div class="example-content">
+            <div class="example-screenshot">
+              <div style="margin-bottom:0.75rem; font-weight:bold; font-size:0.95rem">From: <span class="warning-highlight" data-warn="⚠ Internal impersonation">IT-Support@your-company-helpdesk.com</span></div>
+              <div style="margin-bottom:0.75rem; font-weight:bold">Subject: Action Required: <span class="warning-highlight" data-warn="⚠ Password never expires in 24h">Your Password Expires in 24 Hours</span></div>
+              <div style="border-top:1px solid #ddd; padding-top:0.75rem; font-size:0.9rem;">
+                Hi [Employee],<br><br>
+                Your network password will expire today. To <span class="warning-highlight" data-warn="⚠ IT never asks for password via email">avoid disruption, reply with your current password</span> and we will extend it for 90 days. Alternatively, reset it via the link below.<br><br>
+                <span class="warning-highlight" data-warn="⚠ URL doesn't match company domain">Reset Now: http://bit.ly/3xK9pQ2</span>
+              </div>
+            </div>
+            <ul class="warning-list">
+              <li><span class="warning-num">1</span>Legitimate IT will NEVER ask for your password via email — this alone is a definitive red flag</li>
+              <li><span class="warning-num">2</span>URL shorteners hide the true destination; always hover before clicking</li>
+              <li><span class="warning-num">3</span>Generic greeting [Employee] instead of your actual name</li>
+              <li><span class="warning-num">4</span>Domain "your-company-helpdesk.com" is external, not your company's actual domain</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Panel 2 -->
+      <div class="example-panel">
+        <div class="example-card reveal">
+          <div class="example-header">
+            <div class="example-title">Package Delivery Scam</div>
+            <span class="severity-badge severity-high">High</span>
+          </div>
+          <div class="example-content">
+            <div class="example-screenshot">
+              <div style="margin-bottom:0.75rem; font-weight:bold; font-size:0.95rem">From: <span class="warning-highlight" data-warn="⚠ Not fedex.com">delivery-notification@fedex-tracking-update.com</span></div>
+              <div style="margin-bottom:0.75rem; font-weight:bold">Subject: <span class="warning-highlight" data-warn="⚠ Package fee is a scam tactic">📦 Your Package is On Hold — $2.99 Fee Required</span></div>
+              <div style="border-top:1px solid #ddd; padding-top:0.75rem; font-size:0.9rem;">
+                Your package #<span class="warning-highlight" data-warn="⚠ Fake tracking number">FX-48291-US</span> could not be delivered due to an unpaid customs fee.<br><br>
+                Pay $2.99 to release your package: <span class="warning-highlight" data-warn="⚠ Malicious redirect">www.fedex-customs-payment.net/pay</span><br><br>
+                <em style="font-size:0.82rem; color:#888">Failure to pay within 48 hours will result in package return.</em>
+              </div>
+            </div>
+            <ul class="warning-list">
+              <li><span class="warning-num">1</span>FedEx official domain is fedex.com — any variation is fraudulent</li>
+              <li><span class="warning-num">2</span>Small fee requests ($2.99) are used to harvest credit card details, not just the amount</li>
+              <li><span class="warning-num">3</span>If you're not expecting a package, this is almost certainly a scam</li>
+              <li><span class="warning-num">4</span>Verify by visiting fedex.com directly and entering any tracking number provided</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Panel 3 -->
+      <div class="example-panel">
+        <div class="example-card reveal">
+          <div class="example-header">
+            <div class="example-title">Fake Job Offer / Advance Fee Fraud</div>
+            <span class="severity-badge severity-high">High</span>
+          </div>
+          <div class="example-content">
+            <div class="example-screenshot">
+              <div style="margin-bottom:0.75rem; font-weight:bold; font-size:0.95rem">From: <span class="warning-highlight" data-warn="⚠ Not linkedin.com">hr-recruiting@linkedin-jobs-global.com</span></div>
+              <div style="margin-bottom:0.75rem; font-weight:bold">Subject: <span class="warning-highlight" data-warn="⚠ Too good to be true salary">Exclusive Opportunity: $8,500/week — Work From Home</span></div>
+              <div style="border-top:1px solid #ddd; padding-top:0.75rem; font-size:0.9rem;">
+                Congratulations! Your profile was selected for a premium remote position.<br><br>
+                To proceed, please <span class="warning-highlight" data-warn="⚠ Advance fee / PII harvesting">pay a $75 background check fee</span> and provide your <span class="warning-highlight" data-warn="⚠ Identity theft">Social Security Number, bank details, and passport scan</span> to complete onboarding.
+              </div>
+            </div>
+            <ul class="warning-list">
+              <li><span class="warning-num">1</span>Legitimate employers never charge candidates for background checks</li>
+              <li><span class="warning-num">2</span>$8,500/week for unspecified "remote work" is unrealistically high — a classic lure</li>
+              <li><span class="warning-num">3</span>Requesting SSN, bank details, and passport scan before employment is identity theft</li>
+              <li><span class="warning-num">4</span>LinkedIn communicates from @linkedin.com, never third-party domains</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEST PRACTICES -->
+<section id="practices">
+  <div class="practices-container">
+    <div class="reveal">
+      <div class="section-label">Defense Strategies</div>
+      <h2 class="section-title">Your Phishing Defense Playbook</h2>
+      <p class="section-desc">Adopt these security habits to dramatically reduce your risk of becoming a phishing victim.</p>
+    </div>
+    <div class="practices-grid">
+      <div class="practice-card"><div class="practice-num">01</div><div class="practice-icon">🔐</div><div class="practice-name">Enable Multi-Factor Authentication</div><div class="practice-desc">MFA blocks 99.9% of credential-based attacks. Even if attackers steal your password, they cannot access your account without the second factor.</div><div class="practice-status">Critical Defense</div></div>
+      <div class="practice-card"><div class="practice-num">02</div><div class="practice-icon">🔍</div><div class="practice-name">Verify Sender Addresses</div><div class="practice-desc">Hover over the sender's name to reveal the actual email address. Check for subtle misspellings, extra words, or wrong domain extensions.</div><div class="practice-status">First Check</div></div>
+      <div class="practice-card"><div class="practice-num">03</div><div class="practice-icon">🔗</div><div class="practice-name">Hover Before You Click</div><div class="practice-desc">Always hover over links to preview the destination URL. Navigate directly to websites by typing the address rather than clicking email links.</div><div class="practice-status">Essential Habit</div></div>
+      <div class="practice-card"><div class="practice-num">04</div><div class="practice-icon">📞</div><div class="practice-name">Verify Out-of-Band</div><div class="practice-desc">If an email claims to be from your bank or a colleague requesting action, verify via a separate channel — call their known number, don't use contact info in the email.</div><div class="practice-status">Trust Nothing</div></div>
+      <div class="practice-card"><div class="practice-num">05</div><div class="practice-icon">🛡️</div><div class="practice-name">Use a Password Manager</div><div class="practice-desc">Password managers auto-fill credentials only on the correct domain. They won't fill your password on a fake site, providing a powerful anti-phishing layer.</div><div class="practice-status">Smart Defense</div></div>
+      <div class="practice-card"><div class="practice-num">06</div><div class="practice-icon">📧</div><div class="practice-name">Report Suspicious Emails</div><div class="practice-desc">Use your email client's "Report Phishing" button. Reporting helps protect your entire organization and trains filtering systems to catch future attacks.</div><div class="practice-status">Protect Others</div></div>
+      <div class="practice-card"><div class="practice-num">07</div><div class="practice-icon">🔄</div><div class="practice-name">Keep Software Updated</div><div class="practice-desc">Phishing links often exploit browser and OS vulnerabilities. Enable automatic updates to close security gaps that attackers rely on.</div><div class="practice-status">Patch Often</div></div>
+      <div class="practice-card"><div class="practice-num">08</div><div class="practice-icon">🧠</div><div class="practice-name">Pause Before Reacting</div><div class="practice-desc">Urgency is an attacker's primary weapon. Take a breath. A real emergency never requires you to bypass security measures or act without verifying.</div><div class="practice-status">Stay Calm</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <div class="quiz-container">
+    <div class="reveal">
+      <div class="section-label">Knowledge Assessment</div>
+      <h2 class="section-title">Test Your Awareness</h2>
+      <p class="section-desc">10 questions. Score above 80% to earn your Certificate of Completion.</p>
+    </div>
+
+    <!-- QUIZ START SCREEN -->
+    <div class="quiz-ui reveal" id="quiz-start-screen">
+      <div class="quiz-start">
+        <div class="quiz-start-icon">🎯</div>
+        <div class="quiz-start-title">Ready for the Challenge?</div>
+        <div class="quiz-start-desc">Test your phishing awareness with 10 questions. The timer only starts once you begin — so read the rules first.</div>
+        <div class="name-input-group">
+          <div class="name-input-label">Your Full Name <span>*</span> <span style="color:var(--text-muted);font-size:0.65rem">(appears on certificate)</span></div>
+          <input type="text" id="participant-name" class="name-input-field" placeholder="e.g. Alex Johnson" maxlength="48" autocomplete="off" onkeydown="if(event.key==='Enter')startQuiz()">
+          <div class="name-error-msg" id="name-error">⚠ Please enter your name to continue</div>
+        </div>
+        <div class="quiz-start-rules">
+          <div class="rule-item"><span class="rule-icon">❓</span> 10 multiple-choice questions</div>
+          <div class="rule-item"><span class="rule-icon">⏱</span> 30 seconds per question</div>
+          <div class="rule-item"><span class="rule-icon">🏆</span> Score ≥80% to earn a certificate</div>
+          <div class="rule-item"><span class="rule-icon">💾</span> Results saved automatically</div>
+        </div>
+        <button class="btn-start-quiz" onclick="startQuiz()">
+          Start Quiz <span class="start-arrow">→</span>
+        </button>
+        <div class="quiz-best-score" id="best-score-display"></div>
+      </div>
+    </div>
+
+    <div class="quiz-ui" id="quiz-ui" style="display:none">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress"></div></div>
+      <div class="quiz-header">
+        <div class="quiz-counter">Question <span id="q-current">1</span> of <span id="q-total">10</span></div>
+        <div class="quiz-timer" id="quiz-timer">⏱ <span id="timer-val">30</span>s</div>
+      </div>
+      <div class="quiz-body" id="quiz-body">
+        <div class="quiz-question" id="quiz-question"></div>
+        <div class="quiz-context" id="quiz-context"></div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-feedback" id="quiz-feedback"></div>
+      </div>
+      <div class="quiz-footer">
+        <div class="quiz-score-mini">Score: <span id="score-live">0</span>/<span id="score-total">0</span></div>
+        <button class="btn-next" id="btn-next" onclick="nextQuestion()">Next Question →</button>
+      </div>
+    </div>
+
+    <div class="quiz-results" id="quiz-results">
+      <div class="score-ring" id="score-ring">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle class="score-ring-track" cx="80" cy="80" r="68"/>
+          <circle class="score-ring-fill" id="ring-fill" cx="80" cy="80" r="68" stroke-dasharray="427" stroke-dashoffset="427"/>
+        </svg>
+        <div>
+          <div class="score-center" id="result-score-num">0</div>
+          <div class="score-pct">out of 10</div>
+        </div>
+      </div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-message" id="result-message"></div>
+      <div class="result-breakdown">
+        <div class="breakdown-item"><div class="breakdown-num" id="bd-correct" style="color:var(--accent-green)">0</div><div class="breakdown-label">Correct</div></div>
+        <div class="breakdown-item"><div class="breakdown-num" id="bd-wrong" style="color:var(--accent-red)">0</div><div class="breakdown-label">Wrong</div></div>
+        <div class="breakdown-item"><div class="breakdown-num" id="bd-pct" style="color:var(--accent-cyan)">0%</div><div class="breakdown-label">Score</div></div>
+      </div>
+      <div class="result-actions">
+        <button class="btn-primary" onclick="restartQuiz()">🔄 Try Again</button>
+        <button class="btn-secondary" id="cert-btn" onclick="generateCert()" style="display:none">🏆 Get Certificate</button>
+      </div>
+      <div class="certificate-container" id="cert-container">
+        <div class="cert-meta-row">
+          <span class="cert-id-display" id="cert-id-display">—</span>
+          <span class="verify-badge-valid">Verified &amp; Issued</span>
+        </div>
+        <canvas id="cert-canvas" width="1200" height="849"></canvas>
+        <div class="cert-download">
+          <button class="btn-primary" onclick="downloadCert()">⬇ Download Certificate (PNG)</button>
+          <button class="btn-secondary" onclick="downloadCertPDF()">📄 Download as PDF</button>
+          <button class="btn-copy-link" onclick="copyCertLink()" id="cert-copy-btn">🔗 Copy Verify Link</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONGRATS OVERLAY -->
+<div class="congrats-overlay" id="congrats-overlay">
+  <div class="congrats-box">
+    <div class="congrats-top">
+      <div class="confetti-container" id="confetti-container"></div>
+      <div class="congrats-badge">🏆</div>
+      <div class="congrats-label">✦ Achievement Unlocked ✦</div>
+      <div class="congrats-headline">Congratulations!</div>
+      <div class="congrats-name" id="congrats-name-display"></div>
+    </div>
+    <div class="congrats-body">
+      <div class="congrats-score-row">
+        <div class="congrats-stat">
+          <span class="congrats-stat-num" id="cg-score" style="color:var(--accent-green)">0</span>
+          <div class="congrats-stat-label">Correct</div>
+        </div>
+        <div class="congrats-stat">
+          <span class="congrats-stat-num" id="cg-pct" style="color:var(--accent-cyan)">0%</span>
+          <div class="congrats-stat-label">Score</div>
+        </div>
+        <div class="congrats-stat">
+          <span class="congrats-stat-num" id="cg-wrong" style="color:var(--accent-red)">0</span>
+          <div class="congrats-stat-label">Missed</div>
+        </div>
+      </div>
+      <div class="congrats-msg" id="congrats-msg"></div>
+      <div class="congrats-actions">
+        <button class="btn-congrats-cert" onclick="closeCongrats(); setTimeout(generateCert, 300)">🎓 View Certificate</button>
+        <button class="btn-congrats-close" onclick="closeCongrats()">Continue →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VERIFY CERTIFICATE SECTION -->
+<section id="verify">
+  <div class="verify-container">
+    <div class="reveal">
+      <div class="section-label">Certification Authority</div>
+      <h2 class="section-title">Verify a Certificate</h2>
+      <p class="section-desc">Enter a Certificate ID to instantly verify its authenticity. All certificates issued by PhishGuard are stored and verifiable.</p>
+    </div>
+
+    <div class="verify-search-box reveal">
+      <div class="verify-input-row">
+        <input type="text" id="verify-input" class="verify-input" placeholder="e.g. CERT-2026-0001" maxlength="20" onkeydown="if(event.key==='Enter')verifyCert()" autocomplete="off" spellcheck="false">
+        <button class="btn-verify" onclick="verifyCert()">🔍 Verify Now</button>
+      </div>
+      <div class="verify-hint">Format: CERT-YYYY-NNNN &nbsp;·&nbsp; IDs are case-insensitive</div>
+    </div>
+
+    <div class="verify-result" id="verify-result"></div>
+
+    <div class="recent-certs reveal" id="recent-certs-block" style="display:none">
+      <div class="recent-title">📋 Recently Issued Certificates</div>
+      <div class="recent-list" id="recent-certs-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">⛨ PhishGuard</div>
+  <div class="footer-text">CYBERSECURITY AWARENESS TRAINING · PROTECT YOUR ORGANIZATION · STAY VIGILANT</div>
+</footer>
+
+<script>
+// ─── MATRIX RAIN ──────────────────────────────────
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const fontSize = 12;
+let columns = Math.floor(canvas.width / fontSize);
+let drops = Array(columns).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(3,5,8,0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#00d4ff';
+  ctx.font = `${fontSize}px Share Tech Mono`;
+  drops.forEach((y, i) => {
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(char, i * fontSize, y * fontSize);
+    if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  });
+}
+setInterval(drawMatrix, 55);
+
+// ─── STAT COUNTER ─────────────────────────────────
+function animateCounter(el) {
+  const target = parseFloat(el.dataset.target);
+  const isDecimal = target < 10;
+  const duration = 2000;
+  const step = duration / 60;
+  let current = 0;
+  const increment = target / (duration / step);
+  const timer = setInterval(() => {
+    current += increment;
+    if (current >= target) { current = target; clearInterval(timer); }
+    el.textContent = isDecimal ? current.toFixed(1) : Math.floor(current);
+  }, step);
+}
+
+const statsObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('[data-target]').forEach(animateCounter);
+      statsObs.disconnect();
+    }
+  });
+}, { threshold: 0.5 });
+statsObs.observe(document.querySelector('.hero-stats'));
+
+// ─── SCROLL REVEAL ────────────────────────────────
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), 0);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ─── PRACTICE CARDS ───────────────────────────────
+const practiceObs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('in-view'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.practice-card').forEach(el => practiceObs.observe(el));
+
+// ─── PHISHING EMAIL TOOLTIPS ─────────────────────
+const tooltipData = {
+  1: {
+    icon: '📧',
+    title: 'Suspicious Sender Domain',
+    body: 'The sender\'s email is "paypa1-notifications.net" — note the number "1" instead of the letter "l". This is a classic typosquatting attack. PayPal only sends emails from @paypal.com.',
+    tip: 'Always check the full domain. Hover over the sender name to reveal it. Attackers register lookalike domains to deceive at a glance.'
+  },
+  2: {
+    icon: '🚨',
+    title: 'URGENT Subject Line Manipulation',
+    body: '"URGENT" and "Immediate Action Required" in the subject line are designed to trigger an emotional stress response. Attackers want you to act quickly, before you think critically.',
+    tip: 'The more urgent an email feels, the more you should slow down and verify. Legitimate companies rarely use ALL CAPS or extreme urgency language.'
+  },
+  3: {
+    icon: '👻',
+    title: 'Vague Threat Without Details',
+    body: '"Unusual activity detected" is intentionally vague. Legitimate companies always provide specific transaction details, dates, and amounts — not generic claims designed to scare everyone.',
+    tip: 'Legitimate security alerts include account last-four digits, transaction amount/date, or device information. No specifics = likely phishing.'
+  },
+  4: {
+    icon: '⏰',
+    title: 'Artificial Time Pressure',
+    body: '"Within the next 24 hours" creates a false deadline to prevent you from verifying through official channels. This is one of the most effective psychological manipulation tactics in phishing.',
+    tip: 'If you feel time pressure, stop. Real account restrictions don\'t expire in exactly 24 hours. Call the company directly using the number on their official website.'
+  },
+  5: {
+    icon: '🔗',
+    title: 'Malicious Call-to-Action Button',
+    body: 'This button would redirect you to a convincing fake PayPal login page that captures your credentials. The link in the button is NOT paypal.com — it leads to the attacker\'s server.',
+    tip: 'Never click email buttons for account access. Navigate directly to paypal.com by typing it in your browser. Hover over buttons to preview the actual destination URL.'
+  },
+  6: {
+    icon: '🌍',
+    title: 'Incorrect Company Address',
+    body: 'PayPal, Inc. is headquartered in San Jose, California — not London UK. Attackers often use incorrect or fabricated addresses, hoping recipients don\'t know the real details.',
+    tip: 'Cross-reference company details with their official website. Also note: real PayPal emails include your name, not "Valued Customer".'
+  }
+};
+
+let foundCount = 0;
+const foundItems = new Set();
+
+document.querySelectorAll('.suspicious').forEach(el => {
+  el.addEventListener('click', function() {
+    const id = this.dataset.id;
+    const data = tooltipData[id];
+    if (!data) return;
+
+    if (!foundItems.has(id)) {
+      foundItems.add(id);
+      foundCount++;
+      document.getElementById('found-count').textContent = foundCount;
+      this.classList.add('clicked');
+    }
+
+    document.getElementById('tooltip-icon').textContent = data.icon;
+    document.getElementById('tooltip-title').textContent = data.title;
+    document.getElementById('tooltip-body').textContent = data.body;
+    document.getElementById('tooltip-tip').textContent = '💡 PRO TIP: ' + data.tip;
+    document.getElementById('tooltip-progress').textContent = `Red Flag ${id} of 6`;
+    document.getElementById('tooltip-overlay').classList.add('active');
+  });
+});
+
+function closeTooltip() {
+  document.getElementById('tooltip-overlay').classList.remove('active');
+}
+
+document.getElementById('tooltip-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeTooltip();
+});
+
+// ─── EXAMPLE TABS ─────────────────────────────────
+function showTab(idx) {
+  document.querySelectorAll('.example-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.example-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+
+// ─── QUIZ ──────────────────────────────────────────
+const questions = [
+  {
+    q: "An email from 'security@paypa1.com' asks you to verify your account. What should you do?",
+    options: ["Click the link and verify", "Forward it to a friend", "Check: it's 'paypa1' not 'paypal' — this is a phishing attack", "Reply asking for more information"],
+    answer: 2,
+    fb_correct: "Correct! 'paypa1.com' uses the number 1 instead of the letter l. Always check sender domains character by character.",
+    fb_wrong: "The domain 'paypa1.com' substitutes the number 1 for the letter l — a classic typosquatting technique. Never interact with emails from lookalike domains."
+  },
+  {
+    q: "Your IT department emails you asking for your password to fix a system issue. What's the correct response?",
+    options: ["Reply with your password — IT needs it", "Call IT directly to verify, but do not provide your password", "Send your password only if they provide a ticket number", "Change your password and send the new one"],
+    answer: 1,
+    fb_correct: "Exactly right. Legitimate IT departments NEVER ask for passwords via email. Always verify via a known phone number, and never share your password.",
+    fb_wrong: "Legitimate IT staff never need — or should ask for — your password via email. If someone asks, it's either a phishing attack or a security policy violation."
+  },
+  {
+    q: "Which URL is most likely legitimate for a PayPal login page?",
+    options: ["http://paypal-secure-login.com/signin", "https://www.paypal.com/signin", "https://secure.paypa1.com/login", "http://signin-paypal.net"],
+    answer: 1,
+    context: "Examine each URL carefully before clicking. The protocol (https vs http), domain, and path all matter.",
+    fb_correct: "Correct! Only https://www.paypal.com uses the authentic domain. HTTPS matters, but the domain is the most critical factor.",
+    fb_wrong: "The only legitimate URL is https://www.paypal.com/signin. Look for the exact company domain — not domains with 'paypal' added before/after a hyphen."
+  },
+  {
+    q: "You receive an urgent email: 'Your account will be deleted in 2 hours unless you click here.' What does this indicate?",
+    options: ["A real security emergency that needs immediate action", "A social engineering tactic using artificial urgency", "A routine security reminder", "A legitimate password reset"],
+    answer: 1,
+    fb_correct: "Correct! Extreme urgency and short deadlines are hallmark manipulation tactics. Real account issues rarely have 2-hour deadlines.",
+    fb_wrong: "Artificial urgency is one of the most common phishing tactics. The 2-hour deadline is designed to prevent you from verifying the email before acting."
+  },
+  {
+    q: "What is 'spear phishing'?",
+    options: ["A phishing attack targeting multiple random recipients", "A highly targeted attack using personalized details about the victim", "Phishing conducted exclusively via SMS", "Phishing that targets only senior executives"],
+    answer: 1,
+    fb_correct: "That's right. Spear phishing uses personal details (from LinkedIn, social media, or data breaches) to create convincing targeted attacks.",
+    fb_wrong: "Spear phishing uses personal information to craft highly tailored attacks. Unlike bulk phishing, it uses your name, company, role, or recent activities to seem legitimate."
+  },
+  {
+    q: "A package delivery email asks for a $2.99 customs fee. You weren't expecting any package. What should you do?",
+    options: ["Pay it — it's only $2.99", "Ignore and delete the email", "Contact the courier directly using their official website to verify", "Pay using a prepaid card to stay safe"],
+    answer: 2,
+    fb_correct: "Correct! Always verify delivery notifications by visiting the courier's official website directly. Small fee requests harvest credit card details.",
+    fb_wrong: "Small fees are designed to seem negligible, but the goal is harvesting your credit card information. Always verify via official courier websites, not email links."
+  },
+  {
+    q: "Which of these best practices provides the MOST protection against phishing credential theft?",
+    options: ["Using a complex password", "Enabling Multi-Factor Authentication (MFA)", "Checking emails on mobile only", "Using a VPN"],
+    answer: 1,
+    fb_correct: "Correct! MFA blocks over 99.9% of automated attacks and most phishing attacks, even if your password is stolen.",
+    fb_wrong: "MFA is the single most effective defense. Even if phishers steal your password, they cannot access your account without the second factor."
+  },
+  {
+    q: "You get an email appearing to be from your CEO asking you to urgently wire $15,000. What is this attack type?",
+    options: ["Malware distribution", "Business Email Compromise (BEC) / Whaling", "Ransomware delivery", "Spam advertising"],
+    answer: 1,
+    fb_correct: "Correct! This is BEC or 'Whaling' — impersonating executives to authorize fraudulent financial transfers. It costs businesses over $1.8 billion annually.",
+    fb_wrong: "This is Business Email Compromise (BEC), sometimes called 'whaling' when targeting executives. Always verify financial requests via direct phone call to a known number."
+  },
+  {
+    q: "An email link shows 'Click here' text. Before clicking, what's the safest way to check where it leads?",
+    options: ["Click and quickly close if it looks wrong", "Hover over the link to preview the actual URL", "Copy and paste the link into search engine", "Count the letters in the URL"],
+    answer: 1,
+    fb_correct: "Correct! Hovering reveals the real destination URL in your browser's status bar, exposing mismatches between displayed text and actual links.",
+    fb_wrong: "Hovering over a link shows the real destination in the status bar. 'Click here' text can hide any URL — always preview before clicking."
+  },
+  {
+    q: "A job offer promises $8,500/week for remote work, requiring you to send a $75 background check fee first. This is a:",
+    options: ["Legitimate premium job offer", "Advance fee fraud / phishing scam", "Government employment program", "Standard HR procedure"],
+    answer: 1,
+    fb_correct: "Correct! Legitimate employers never charge candidates. Requests for upfront fees combined with unusually high salaries are classic advance fee fraud tactics.",
+    fb_wrong: "No legitimate employer charges job applicants fees. This advance-fee fraud combines an unrealistic salary with an upfront payment to steal money and personal information."
+  }
+];
+
+let currentQ = 0;
+let score = 0;
+let answered = 0;
+let timerInterval;
+let timeLeft = 30;
+let quizActive = false;
+
+function loadQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('q-current').textContent = currentQ + 1;
+  document.getElementById('q-total').textContent = questions.length;
+  document.getElementById('quiz-progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('quiz-question').textContent = q.q;
+
+  const ctxEl = document.getElementById('quiz-context');
+  if (q.context) { ctxEl.textContent = '📌 ' + q.context; ctxEl.style.display = 'block'; }
+  else ctxEl.style.display = 'none';
+
+  const opts = document.getElementById('quiz-options');
+  opts.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    opts.appendChild(btn);
+  });
+
+  document.getElementById('quiz-feedback').className = 'quiz-feedback';
+  document.getElementById('btn-next').className = 'btn-next';
+  document.getElementById('score-live').textContent = score;
+  document.getElementById('score-total').textContent = answered;
+
+  startTimer();
+  quizActive = true;
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 30;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      autoFail();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer-val');
+  const timerEl = document.getElementById('quiz-timer');
+  el.textContent = timeLeft;
+  timerEl.classList.toggle('warning', timeLeft <= 10);
+}
+
+function autoFail() {
+  if (!quizActive) return;
+  quizActive = false;
+  const q = questions[currentQ];
+  answered++;
+  document.querySelectorAll('.quiz-option').forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === q.answer) btn.classList.add('correct');
+  });
+  const fb = document.getElementById('quiz-feedback');
+  fb.className = 'quiz-feedback wrong-fb show';
+  fb.textContent = '⏰ Time\'s up! ' + q.fb_wrong;
+  document.getElementById('score-live').textContent = score;
+  document.getElementById('score-total').textContent = answered;
+  document.getElementById('btn-next').className = 'btn-next show';
+}
+
+function selectAnswer(selected) {
+  if (!quizActive) return;
+  quizActive = false;
+  clearInterval(timerInterval);
+  const q = questions[currentQ];
+  answered++;
+  const isCorrect = selected === q.answer;
+  if (isCorrect) score++;
+
+  document.querySelectorAll('.quiz-option').forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === q.answer) btn.classList.add('correct');
+    else if (i === selected && !isCorrect) btn.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('quiz-feedback');
+  if (isCorrect) {
+    fb.className = 'quiz-feedback correct-fb show';
+    fb.textContent = '✓ ' + q.fb_correct;
+  } else {
+    fb.className = 'quiz-feedback wrong-fb show';
+    fb.textContent = '✗ ' + q.fb_wrong;
+  }
+
+  document.getElementById('score-live').textContent = score;
+  document.getElementById('score-total').textContent = answered;
+  document.getElementById('btn-next').className = 'btn-next show';
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    loadQuestion();
+  }
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  document.getElementById('quiz-body').style.display = 'none';
+  document.querySelector('#quiz-ui .quiz-progress-bar').style.display = 'none';
+  document.querySelector('#quiz-ui .quiz-header').style.display = 'none';
+  document.querySelector('#quiz-ui .quiz-footer').style.display = 'none';
+
+  const pct = Math.round((score / questions.length) * 100);
+  const passed = pct >= 80;
+
+  document.getElementById('result-score-num').textContent = score;
+  document.getElementById('bd-correct').textContent = score;
+  document.getElementById('bd-wrong').textContent = questions.length - score;
+  document.getElementById('bd-pct').textContent = pct + '%';
+
+  const ringFill = document.getElementById('ring-fill');
+  const circumference = 427;
+  const offset = circumference - (pct / 100) * circumference;
+  ringFill.style.stroke = passed ? 'var(--accent-green)' : score >= 5 ? 'var(--accent-amber)' : 'var(--accent-red)';
+  document.getElementById('result-score-num').style.color = passed ? 'var(--accent-green)' : score >= 5 ? 'var(--accent-amber)' : 'var(--accent-red)';
+  setTimeout(() => { ringFill.style.strokeDashoffset = offset; }, 100);
+
+  document.getElementById('result-title').textContent = passed ? '🎉 Certified! You Passed.' : score >= 5 ? '📚 Good Effort — Keep Learning' : '🛡️ More Training Needed';
+  document.getElementById('result-message').textContent = passed
+    ? `Outstanding! You scored ${pct}% and have demonstrated strong phishing awareness. Download your certificate below.`
+    : `You scored ${pct}%. A score of 80% or higher is required for certification. Review the sections above and try again!`;
+
+  if (passed) {
+    document.getElementById('cert-btn').style.display = 'inline-flex';
+  }
+
+  document.getElementById('quiz-results').className = 'quiz-results show';
+
+  // Save to localStorage
+  const history = JSON.parse(localStorage.getItem('phishguard_history') || '[]');
+  history.push({ date: new Date().toISOString(), score, pct, passed });
+  localStorage.setItem('phishguard_history', JSON.stringify(history));
+  localStorage.setItem('phishguard_best', Math.max(pct, parseInt(localStorage.getItem('phishguard_best') || '0')));
+}
+
+function restartQuiz() {
+  currentQ = 0; score = 0; answered = 0;
+  document.getElementById('quiz-results').className = 'quiz-results';
+  document.getElementById('cert-container').className = 'certificate-container';
+  document.getElementById('cert-btn').style.display = 'none';
+  // Reset quiz UI internals
+  document.getElementById('quiz-body').style.display = 'block';
+  document.querySelector('#quiz-ui .quiz-progress-bar').style.display = 'block';
+  document.querySelector('#quiz-ui .quiz-header').style.display = 'flex';
+  document.querySelector('#quiz-ui .quiz-footer').style.display = 'flex';
+  // Hide quiz UI, show start screen
+  document.getElementById('quiz-ui').style.display = 'none';
+  const startScreen = document.getElementById('quiz-start-screen');
+  startScreen.style.display = 'block';
+  // Update best score display
+  const best = localStorage.getItem('phishguard_best');
+  if (best) {
+    const el = document.getElementById('best-score-display');
+    if (el) el.innerHTML = `Your best score: <span>${best}%</span>`;
+  }
+}
+
+// ─── CERT ID SYSTEM ───────────────────────────────
+function generateCertId() {
+  const year = new Date().getFullYear();
+  const records = JSON.parse(localStorage.getItem('pg_cert_records') || '[]');
+  const num = String(records.length + 1).padStart(4, '0');
+  return `CERT-${year}-${num}`;
+}
+
+function saveCertRecord(id, name, date) {
+  const records = JSON.parse(localStorage.getItem('pg_cert_records') || '[]');
+  if (!records.find(r => r.id === id)) {
+    records.push({ id, name, date, course: 'Phishing Awareness Training Program' });
+    localStorage.setItem('pg_cert_records', JSON.stringify(records));
+  }
+}
+
+function lookupCert(id) {
+  const records = JSON.parse(localStorage.getItem('pg_cert_records') || '[]');
+  return records.find(r => r.id.toUpperCase() === id.toUpperCase()) || null;
+}
+
+// ─── QR CODE HELPER ───────────────────────────────
+function drawQROnCanvas(c, text, x, y, size) {
+  const tmp = document.createElement('div');
+  tmp.style.cssText = `position:absolute;left:-9999px;top:-9999px;width:${size}px;height:${size}px`;
+  document.body.appendChild(tmp);
+  try {
+    new QRCode(tmp, { text, width: size, height: size, colorDark: '#0a1e3a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    setTimeout(() => {
+      const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+      if (el) {
+        const src = el.toDataURL ? el.toDataURL() : el.src;
+        const img = new Image();
+        img.onload = () => { c.drawImage(img, x, y, size, size); };
+        img.src = src;
+      }
+      try { document.body.removeChild(tmp); } catch(e) {}
+    }, 200);
+  } catch(e) { try { document.body.removeChild(tmp); } catch(ex) {} }
+}
+
+// ─── CERTIFICATE ──────────────────────────────────
+let currentCertId = null;
+
+function generateCert() {
+  document.getElementById('cert-container').className = 'certificate-container show';
+  setTimeout(() => document.getElementById('cert-container').scrollIntoView({ behavior: 'smooth', block: 'center' }), 120);
+
+  if (!currentCertId) {
+    currentCertId = generateCertId();
+    const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    saveCertRecord(currentCertId, window.participantName || 'Participant', dateStr);
+    renderRecentCerts();
+  }
+
+  document.getElementById('cert-id-display').textContent = currentCertId;
+
+  const baseURL = location.href.split('#')[0];
+  const verifyURL = `${baseURL}#verify?id=${currentCertId}`;
+
+  const certCanvas = document.getElementById('cert-canvas');
+  const c = certCanvas.getContext('2d');
+  const W = 1200, H = 849;
+  certCanvas.width = W; certCanvas.height = H;
+
+  const name = (window.participantName || 'Participant').trim();
+  const now  = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  // ── CREAM BACKGROUND ────────────────────────────────────────────────────
+  c.fillStyle = '#fdfcf8';
+  c.fillRect(0, 0, W, H);
+  // Subtle grain
+  c.save(); c.globalAlpha = 0.02;
+  for (let i = -H; i < W + H; i += 16) {
+    c.beginPath(); c.strokeStyle = '#888'; c.lineWidth = 1;
+    c.moveTo(i, 0); c.lineTo(i + H, H); c.stroke();
+  }
+  c.restore();
+
+  // ── GOLD OUTER BORDER ────────────────────────────────────────────────────
+  const gOuter = c.createLinearGradient(0, 0, W, H);
+  gOuter.addColorStop(0, '#b8860b'); gOuter.addColorStop(0.3, '#d4a017');
+  gOuter.addColorStop(0.5, '#f5c518'); gOuter.addColorStop(0.7, '#d4a017'); gOuter.addColorStop(1, '#b8860b');
+  c.strokeStyle = gOuter; c.lineWidth = 8; c.strokeRect(14, 14, W-28, H-28);
+  c.strokeStyle = 'rgba(212,160,23,0.45)'; c.lineWidth = 1.5; c.strokeRect(27, 27, W-54, H-54);
+  c.strokeStyle = 'rgba(10,30,60,0.1)'; c.lineWidth = 1;
+  c.strokeRect(36, 36, W-72, H-72); c.strokeRect(42, 42, W-84, H-84);
+
+  // ── CORNER ORNAMENTS ─────────────────────────────────────────────────────
+  _certCorner(c, 42, 42,  1,  1); _certCorner(c, W-42, 42,  -1,  1);
+  _certCorner(c, 42, H-42, 1, -1); _certCorner(c, W-42, H-42,-1,-1);
+
+  // ── HEADER BAND ──────────────────────────────────────────────────────────
+  const hGrad = c.createLinearGradient(0, 0, W, 0);
+  hGrad.addColorStop(0,'#0a1e3a'); hGrad.addColorStop(0.5,'#0d2a52'); hGrad.addColorStop(1,'#0a1e3a');
+  c.fillStyle = hGrad; c.fillRect(42, 42, W-84, 126);
+  // Gold top/bottom lines of header
+  const hLine = c.createLinearGradient(42,0,W-42,0);
+  hLine.addColorStop(0,'transparent'); hLine.addColorStop(0.5,'#f5c518'); hLine.addColorStop(1,'transparent');
+  c.fillStyle = hLine; c.fillRect(42, 42, W-84, 2); c.fillRect(42, 166, W-84, 2);
+
+  // Shield + Org name in header
+  c.font = '40px serif'; c.textAlign = 'center'; c.fillStyle = '#f5c518';
+  c.fillText('⛨', W/2, 96);
+  c.fillStyle = '#ffffff'; c.font = 'bold 14px Share Tech Mono, monospace';
+  c.fillText('P H I S H G U A R D   ·   C Y B E R S E C U R I T Y   T R A I N I N G', W/2, 124);
+  c.fillStyle = 'rgba(245,197,24,0.55)'; c.font = '10.5px Share Tech Mono, monospace';
+  c.fillText('ISSUED BY THE PHISHGUARD CYBERSECURITY AWARENESS INSTITUTE', W/2, 149);
+
+  // ── CERTIFICATE TITLE ────────────────────────────────────────────────────
+  c.fillStyle = '#0a1e3a'; c.font = 'bold 50px Georgia, serif';
+  c.fillText('Certificate of Completion', W/2, 256);
+  _goldDiv(c, W/2, 272, 270);
+  c.fillStyle = '#2a4a7a'; c.font = 'italic 21px Georgia, serif';
+  c.fillText('Phishing Awareness Training Program', W/2, 308);
+
+  // ── PRESENTED TO ─────────────────────────────────────────────────────────
+  c.fillStyle = '#5a7090'; c.font = '16px Georgia, serif';
+  c.fillText('This certificate is proudly presented to', W/2, 354);
+
+  // ── NAME ─────────────────────────────────────────────────────────────────
+  const maxNW = W - 180;
+  let nSize = 64; c.font = `italic bold ${nSize}px Georgia, serif`;
+  while (c.measureText(name).width > maxNW && nSize > 30) { nSize -= 2; c.font = `italic bold ${nSize}px Georgia, serif`; }
+  c.save();
+  c.shadowColor = 'rgba(10,30,60,0.18)'; c.shadowBlur = 6; c.shadowOffsetY = 2;
+  c.fillStyle = '#0a1e3a'; c.fillText(name, W/2, 426);
+  c.restore();
+  const nmW = Math.min(c.measureText(name).width + 70, maxNW);
+  _goldDiv(c, W/2, 441, nmW/2);
+
+  // ── ACHIEVEMENT TEXT ─────────────────────────────────────────────────────
+  c.fillStyle = '#3a5070'; c.font = '16px Georgia, serif';
+  c.fillText('For successfully completing the Phishing Awareness Training and demonstrating', W/2, 480);
+  c.fillText('knowledge of cybersecurity best practices and phishing attack recognition.', W/2, 502);
+
+  // ── SIGNATURE AREA ───────────────────────────────────────────────────────
+  const sigY = 578;
+  _sigLine(c, 195, sigY, 155);
+  c.fillStyle = '#0a1e3a'; c.font = 'bold 12.5px Georgia, serif'; c.textAlign = 'center';
+  c.fillText('Dr. Sarah Mitchell', 195, sigY+20);
+  c.fillStyle = '#5a7090'; c.font = '11px Georgia, serif';
+  c.fillText('Director, Cybersecurity Training', 195, sigY+36);
+  c.fillText('PhishGuard Program', 195, sigY+51);
+
+  _sigLine(c, W-195, sigY, 155);
+  c.fillStyle = '#0a1e3a'; c.font = 'bold 12.5px Georgia, serif';
+  c.fillText('James R. Thornton', W-195, sigY+20);
+  c.fillStyle = '#5a7090'; c.font = '11px Georgia, serif';
+  c.fillText('Chief Security Officer', W-195, sigY+36);
+  c.fillText('PhishGuard Institute', W-195, sigY+51);
+
+  // ── SEAL ─────────────────────────────────────────────────────────────────
+  const sx = W/2, sy = sigY + 18;
+  c.save();
+  c.beginPath(); c.arc(sx, sy, 54, 0, Math.PI*2);
+  const sg = c.createRadialGradient(sx,sy,6,sx,sy,54);
+  sg.addColorStop(0,'#0d2a52'); sg.addColorStop(1,'#0a1e3a');
+  c.fillStyle = sg; c.fill();
+  c.strokeStyle = '#f5c518'; c.lineWidth = 2.8; c.stroke();
+  c.beginPath(); c.arc(sx, sy, 45, 0, Math.PI*2);
+  c.strokeStyle = 'rgba(245,197,24,0.35)'; c.lineWidth = 1; c.stroke();
+  c.font = 'bold 8px Share Tech Mono, monospace'; c.fillStyle = '#f5c518';
+  _arcText(c, 'PHISHGUARD · CERTIFIED ·', sx, sy, 37, -Math.PI*0.85, Math.PI*0.15);
+  c.font = '26px serif'; c.fillStyle = '#f5c518'; c.textAlign = 'center';
+  c.fillText('⛨', sx, sy + 9);
+  c.font = 'bold 7.5px Share Tech Mono, monospace'; c.fillStyle = 'rgba(245,197,24,0.65)';
+  _arcText(c, String(now.getFullYear()), sx, sy, 37, Math.PI*0.22, Math.PI*0.78, true);
+  c.restore();
+
+  // ── FOOTER BAND ──────────────────────────────────────────────────────────
+  const fGrad = c.createLinearGradient(0,0,W,0);
+  fGrad.addColorStop(0,'#0a1e3a'); fGrad.addColorStop(0.5,'#0d2a52'); fGrad.addColorStop(1,'#0a1e3a');
+  c.fillStyle = fGrad; c.fillRect(42, H-96, W-84, 54);
+  const fLine = c.createLinearGradient(42,0,W-42,0);
+  fLine.addColorStop(0,'transparent'); fLine.addColorStop(0.5,'#f5c518'); fLine.addColorStop(1,'transparent');
+  c.fillStyle = fLine; c.fillRect(42, H-96, W-84, 1.5);
+
+  // Footer: Cert ID (left), Date (center), Verify URL (right)
+  c.textAlign = 'left';
+  c.fillStyle = 'rgba(255,255,255,0.45)'; c.font = '9px Share Tech Mono, monospace';
+  c.fillText('CERTIFICATE ID:', 68, H-74);
+  c.fillStyle = '#f5c518'; c.font = 'bold 10.5px Share Tech Mono, monospace';
+  c.fillText(currentCertId, 68, H-58);
+
+  c.textAlign = 'center';
+  c.fillStyle = 'rgba(255,255,255,0.45)'; c.font = '9px Share Tech Mono, monospace';
+  c.fillText('DATE OF ISSUE:', W/2, H-74);
+  c.fillStyle = '#ffffff'; c.font = '10px Share Tech Mono, monospace';
+  c.fillText(dateStr.toUpperCase(), W/2, H-58);
+
+  c.textAlign = 'right';
+  c.fillStyle = 'rgba(255,255,255,0.45)'; c.font = '9px Share Tech Mono, monospace';
+  c.fillText('VERIFY AT:', W-68, H-74);
+  c.fillStyle = 'rgba(255,255,255,0.65)'; c.font = '8.5px Share Tech Mono, monospace';
+  c.fillText(verifyURL.length > 65 ? verifyURL.slice(0,65)+'…' : verifyURL, W-68, H-58);
+
+  c.textAlign = 'center'; c.fillStyle = '#7a9ab8'; c.font = '10px Georgia, serif';
+  c.fillText('This certificate verifies successful completion of cybersecurity awareness training.', W/2, H-28);
+
+  // ── QR CODE ──────────────────────────────────────────────────────────────
+  const qrSize = 82, qrX = W - 42 - qrSize - 22, qrY = H - 96 - qrSize - 58;
+  c.fillStyle = '#ffffff'; c.fillRect(qrX-4, qrY-4, qrSize+8, qrSize+8);
+  c.strokeStyle = 'rgba(212,160,23,0.5)'; c.lineWidth = 1; c.strokeRect(qrX-4, qrY-4, qrSize+8, qrSize+8);
+  drawQROnCanvas(c, verifyURL, qrX, qrY, qrSize);
+  c.fillStyle = '#5a7090'; c.font = '7.5px Share Tech Mono, monospace'; c.textAlign = 'center';
+  c.fillText('SCAN TO VERIFY', qrX + qrSize/2, qrY + qrSize + 16);
+}
+
+// ── Drawing helpers ───────────────────────────────
+function _certCorner(c, x, y, sx, sy) {
+  const len = 52, gap = 9;
+  c.strokeStyle = '#d4a017'; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(x+sx*gap, y); c.lineTo(x+sx*len, y);
+  c.moveTo(x, y+sy*gap); c.lineTo(x, y+sy*len); c.stroke();
+  c.beginPath(); c.arc(x+sx*gap*0.5, y+sy*gap*0.5, 2.8, 0, Math.PI*2);
+  c.fillStyle = '#d4a017'; c.fill();
+}
+
+function _goldDiv(c, cx, y, hw) {
+  const g = c.createLinearGradient(cx-hw,0,cx+hw,0);
+  g.addColorStop(0,'transparent'); g.addColorStop(0.4,'#d4a017');
+  g.addColorStop(0.5,'#f5c518'); g.addColorStop(0.6,'#d4a017'); g.addColorStop(1,'transparent');
+  c.fillStyle = g; c.fillRect(cx-hw, y, hw*2, 1.5);
+  c.save(); c.translate(cx, y+0.75); c.rotate(Math.PI/4);
+  c.fillStyle = '#f5c518'; c.fillRect(-3.5,-3.5,7,7); c.restore();
+}
+
+function _sigLine(c, cx, y, w) {
+  c.save(); c.strokeStyle = '#0a1e3a'; c.lineWidth = 1.6;
+  c.beginPath();
+  const sx = cx - w/2;
+  c.moveTo(sx, y);
+  for (let i = 0; i < w; i += 10) {
+    c.quadraticCurveTo(sx+i+2.5, y-5+(Math.sin(i)*3.5), sx+i+5, y+(Math.sin(i*0.35)*2.5));
+    c.quadraticCurveTo(sx+i+7.5, y+5+(Math.cos(i)*2.5), sx+i+10, y);
+  }
+  c.stroke();
+  c.strokeStyle = 'rgba(10,30,60,0.2)'; c.lineWidth = 0.7;
+  c.beginPath(); c.moveTo(cx-w/2, y+4); c.lineTo(cx+w/2, y+4); c.stroke();
+  c.restore();
+}
+
+function _arcText(c, text, cx, cy, r, startAngle, endAngle) {
+  const chars = text.split('');
+  const totalAngle = endAngle - startAngle;
+  const step = totalAngle / chars.length;
+  c.save(); c.textAlign = 'center'; c.textBaseline = 'middle';
+  chars.forEach((ch, i) => {
+    const a = startAngle + step * i + step/2;
+    c.save(); c.translate(cx + r*Math.cos(a), cy + r*Math.sin(a));
+    c.rotate(a + Math.PI/2); c.fillText(ch, 0, 0); c.restore();
+  });
+  c.restore();
+}
+
+function _roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r);
+  ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h);
+  ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r);
+  ctx.arcTo(x,y,x+r,y,r); ctx.closePath(); ctx.fill(); ctx.stroke();
+}
+function roundRect(ctx,x,y,w,h,r){_roundRect(ctx,x,y,w,h,r);}
+
+function downloadCert() {
+  generateCert();
+  setTimeout(() => {
+    const safeName = (window.participantName||'Participant').replace(/[^a-zA-Z0-9 \-_]/g,'').trim().replace(/\s+/g,'_');
+    const a = document.createElement('a');
+    a.download = `PhishGuard_Certificate_${safeName}_${currentCertId}.png`;
+    a.href = document.getElementById('cert-canvas').toDataURL('image/png');
+    a.click();
+  }, 380);
+}
+
+function downloadCertPDF() {
+  generateCert();
+  setTimeout(() => {
+    const dataURL = document.getElementById('cert-canvas').toDataURL('image/png');
+    const win = window.open('','_blank');
+    win.document.write(`<!DOCTYPE html><html><head><title>PhishGuard Certificate — ${escHTML(window.participantName||'')}</title>
+    <style>@page{size:A4 landscape;margin:0}body{margin:0;padding:0;background:#fff}
+    img{width:100%;height:100vh;object-fit:contain;display:block}</style></head>
+    <body><img src="${dataURL}" onload="setTimeout(()=>window.print(),400)"></body></html>`);
+    win.document.close();
+  }, 380);
+}
+
+function copyCertLink() {
+  if (!currentCertId) return;
+  const url = `${location.href.split('#')[0]}#verify?id=${currentCertId}`;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('cert-copy-btn');
+    if (!btn) return;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Copied!'; btn.style.color = 'var(--accent-green)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; }, 2000);
+  }).catch(() => prompt('Copy this link:', `${location.href.split('#')[0]}#verify?id=${currentCertId}`));
+}
+
+// ─── VERIFY SECTION ───────────────────────────────
+function verifyCert() {
+  const raw = document.getElementById('verify-input').value.trim();
+  const id  = raw.toUpperCase();
+  const el  = document.getElementById('verify-result');
+  if (!id) {
+    el.className='verify-result fail show';
+    el.innerHTML=`<div class="verify-result-header"><span class="verify-status-icon">⚠️</span><div><div class="verify-status-title bad">No ID Entered</div><div class="verify-status-sub">Please enter a Certificate ID to verify.</div></div></div>`;
+    return;
+  }
+  const rec = lookupCert(id);
+  if (rec) {
+    el.className='verify-result success show';
+    el.innerHTML=`<div class="verify-result-header">
+      <span class="verify-status-icon">✅</span>
+      <div><div class="verify-status-title ok">Certificate Verified</div>
+      <div class="verify-status-sub">This certificate is authentic and was issued by PhishGuard.</div></div>
+      <span class="verify-badge-valid" style="margin-left:auto">Valid</span></div>
+    <div class="verify-fields">
+      <div class="verify-field"><div class="verify-field-label">Certificate Holder</div><div class="verify-field-value">${escHTML(rec.name)}</div></div>
+      <div class="verify-field"><div class="verify-field-label">Certificate ID</div><div class="verify-field-value" style="font-family:var(--font-mono);color:var(--accent-cyan)">${escHTML(rec.id)}</div></div>
+      <div class="verify-field"><div class="verify-field-label">Course</div><div class="verify-field-value">${escHTML(rec.course)}</div></div>
+      <div class="verify-field"><div class="verify-field-label">Issue Date</div><div class="verify-field-value">${escHTML(rec.date)}</div></div>
+      <div class="verify-field"><div class="verify-field-label">Status</div><div class="verify-field-value"><span class="verify-badge-valid">✓ Valid &amp; Active</span></div></div>
+      <div class="verify-field"><div class="verify-field-label">Issuing Organization</div><div class="verify-field-value">PhishGuard Institute</div></div>
+    </div>
+    <div class="verify-actions">
+      <button class="btn-copy-link" onclick="copyVerifyLink('${escHTML(rec.id)}')">🔗 Copy Verification Link</button>
+    </div>`;
+  } else {
+    el.className='verify-result fail show';
+    el.innerHTML=`<div class="verify-result-header">
+      <span class="verify-status-icon">❌</span>
+      <div><div class="verify-status-title bad">Certificate Not Found</div>
+      <div class="verify-status-sub">The provided Certificate ID is invalid or has not been issued.</div></div></div>
+    <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.7;margin-top:0.5rem">
+      Please check the ID and try again. Certificate IDs follow the format
+      <code style="color:var(--accent-cyan);font-family:var(--font-mono)">CERT-YYYY-NNNN</code>.<br>
+      If you believe this is an error, the certificate may have been issued on a different device or browser.
+    </p>`;
+  }
+}
+
+function copyVerifyLink(id) {
+  const url = `${location.href.split('#')[0]}#verify?id=${id}`;
+  navigator.clipboard.writeText(url).catch(() => prompt('Verification link:', url));
+}
+
+function escHTML(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderRecentCerts() {
+  const records = JSON.parse(localStorage.getItem('pg_cert_records') || '[]');
+  const block = document.getElementById('recent-certs-block');
+  const list  = document.getElementById('recent-certs-list');
+  if (!block || !list) return;
+  if (!records.length) { block.style.display='none'; return; }
+  block.style.display='block';
+  list.innerHTML = [...records].reverse().slice(0,6).map(r=>`
+    <div class="recent-item" onclick="document.getElementById('verify-input').value='${r.id}';verifyCert();document.getElementById('verify-result').scrollIntoView({behavior:'smooth'})">
+      <span class="recent-id">${escHTML(r.id)}</span>
+      <span class="recent-name">${escHTML(r.name)}</span>
+      <span class="recent-date">${escHTML(r.date)}</span>
+    </div>`).join('');
+}
+
+// ─── START QUIZ ───────────────────────────────────
+function startQuiz() {
+  const nameInput = document.getElementById('participant-name');
+  const errEl = document.getElementById('name-error');
+  const name = nameInput ? nameInput.value.trim() : '';
+  if (!name) {
+    if (nameInput) {
+      nameInput.style.borderColor = 'var(--accent-red)';
+      nameInput.style.boxShadow = '0 0 0 3px rgba(255,51,85,0.15)';
+      nameInput.focus();
+      setTimeout(() => { nameInput.style.borderColor=''; nameInput.style.boxShadow=''; }, 1200);
+    }
+    if (errEl) errEl.style.display = 'block';
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+  window.participantName = name;
+  currentCertId = null;
+  document.getElementById('quiz-start-screen').style.display = 'none';
+  const quizUi = document.getElementById('quiz-ui');
+  quizUi.style.display = 'block';
+  quizUi.style.animation = 'fadeInUp 0.4s ease both';
+  loadQuestion();
+}
+
+// ─── INIT ─────────────────────────────────────────
+const best = localStorage.getItem('phishguard_best');
+if (best) {
+  const el = document.getElementById('best-score-display');
+  if (el) el.innerHTML = `Your best score: <span>${best}%</span>`;
+}
+renderRecentCerts();
+
+// Auto-verify from URL
+(function() {
+  const match = (location.hash || '').match(/[?&]id=([A-Z0-9\-]+)/i);
+  if (match) {
+    const id = match[1].toUpperCase();
+    setTimeout(() => {
+      const inp = document.getElementById('verify-input');
+      if (inp) { inp.value = id; verifyCert(); }
+      const sec = document.getElementById('verify');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+    }, 800);
+  }
+})();
+
+</script>
+</body>
+</html>
