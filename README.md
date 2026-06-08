@@ -182,6 +182,8 @@ This project was developed to promote cybersecurity awareness and educate users 
 - Homepage
 - Interactive Email Demo
 - Attack Examples
+- <img width="629" height="645" alt="image" src="https://github.com/user-attachments/assets/d721b883-8a5c-4f16-bc9e-5ffbc29aca85" />
+
 - Quiz Interface
 - Certificate Generation
 - Certificate Verification
