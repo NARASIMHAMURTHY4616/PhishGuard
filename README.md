@@ -186,7 +186,10 @@ This project was developed to promote cybersecurity awareness and educate users 
 
 - Quiz Interface
 - Certificate Generation
+- <img width="1231" height="864" alt="image" src="https://github.com/user-attachments/assets/71be205b-1e01-49b9-a0d3-9af7d540ff22" />
 - Certificate Verification
+- <img width="680" height="691" alt="image" src="https://github.com/user-attachments/assets/512cfe64-3e22-4842-b2dc-1f5596dda23d" />
+
 
 ---
 
