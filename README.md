@@ -173,9 +173,9 @@ No installation required.
 
 ## 🎓 Educational Purpose
 
-This project was developed to promote cybersecurity awareness and educate users about phishing attacks, social engineering techniques, and safe online practices.
-<p align="left">
-  <img src="assets/warning-icon.webp" alt="PhishGuard Banner" width=5px>
+<p align="left"> <span>
+  <img src="assets/warning-icon.webp" alt="PhishGuard Banner" width=30px></span><span>This project was developed to promote cybersecurity awareness and educate users about phishing attacks, social engineering techniques, and safe online practices.
+</span>
 </p>
 
 ---
