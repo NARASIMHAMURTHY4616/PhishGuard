@@ -3209,7 +3209,7 @@ function generateCert() {
   c.fillText('This certificate verifies successful completion of cybersecurity awareness training.', W/2, H-28);
 
   // ── QR CODE ──────────────────────────────────────────────────────────────
-  const qrSize = 82, qrX = W - 42 - qrSize - 22, qrY = H - 96 - qrSize - 58;
+  const qrSize = 52, qrX = W - 40 - qrSize - 22, qrY = H - 96 - qrSize - 58;
   c.fillStyle = '#ffffff'; c.fillRect(qrX-4, qrY-4, qrSize+8, qrSize+8);
   c.strokeStyle = 'rgba(212,160,23,0.5)'; c.lineWidth = 1; c.strokeRect(qrX-4, qrY-4, qrSize+8, qrSize+8);
   drawQROnCanvas(c, verifyURL, qrX, qrY, qrSize);
