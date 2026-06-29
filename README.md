@@ -153,7 +153,7 @@ cd PhishGuard
 Open:
 
 ```text
-index.html
+open index.html
 ```
 
 in your browser.
