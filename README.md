@@ -204,7 +204,11 @@ Contributions are welcome.
 2. Create a feature branch
 3. Commit your changes
 4. Submit a Pull Request
- give star on the github repo
+
+
+---
+ [*] give star on the github repo
+ 
 ---
 
 ## 📜 License
