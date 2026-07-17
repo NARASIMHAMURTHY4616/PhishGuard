@@ -14,6 +14,22 @@ An interactive cybersecurity awareness website that teaches users how to identif
 
 ---
 
+---
+
+---
+
+# GOING LIVE AT
+
+> YOU CAN CLICK ON THE BELOW LINK TO VIEW THE LIVE OF THIS PROJECT 
+
+## [LIVE VIEW ](https://narasimhamurthy4616.github.io/PhishGuard/)
+
+
+---
+
+---
+
+
 ## 🌟 Features
 
 ### 📧 Interactive Phishing Demo
